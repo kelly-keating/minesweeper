@@ -1,19 +1,32 @@
 document.addEventListener('DOMContentLoaded', startGame)
 
 // Define your `board` object here!
-var board = {
-  cells: []
-};
+
 //    {row:0, col:0, isMine:false, hidden:true},{row:0, col:1, isMine:false, hidden:true},{row:0, col:2, isMine:false, hidden:true},
 //    {row:1, col:0, isMine:false, hidden:true},{row:1, col:1, isMine:false, hidden:true},{row:1, col:2, isMine:false, hidden:true},
 //    {row:2, col:0, isMine:true, hidden:true},{row:2, col:1, isMine:false, hidden:true},{row:2, col:2, isMine:false, hidden:true}
+
+var board = {};
 var size = 3;
-//var difficulty = 0;
+var difficulty = 2; //can be set from form
 
 
 
+
+function resetVals(){
+  var s = document.getElementById("initSize");
+  size = s.options[s.selectedIndex].value;
+  var d = document.getElementById("initDiff");
+  difficulty = d.options[d.selectedIndex].value;
+  startGame();
+}
 
 function startGame() {
+
+  var temp = document.getElementsByClassName('board');
+  temp[0].innerHTML = ""; // clear existing board
+  board.cells = []; // re-initialise cells array
+
   createBoard();
 
   for(var i = 0; i < board.cells.length; i++){
@@ -24,17 +37,18 @@ function startGame() {
   document.addEventListener('contextmenu', checkForWin);
 
   // Don't remove this function call: it makes the game work!
-  lib.initBoard()
+  lib.initBoard();
 }
 
 
 function createBoard() {
+
   for(var r = 0; r < size; r++){
     for(var c = 0; c < size; c++){
       var newCell = {
         row: r,
         col: c,
-        isMine: false,
+        isMine: randMine(),
         isMarked: false,
         hidden: true,
         surroundingMines: 0
@@ -42,6 +56,21 @@ function createBoard() {
       board.cells.push(newCell);
     }
   }
+
+//check we have some mines, but not only mines
+  var count = 0;
+  for(var i = 0; i < board.cells.length; i++){
+    if(board.cells[i].isMine == true){
+      count++;
+    }
+  }
+  if(count == 0 || count == board.cells.length){
+    createBoard();
+  }
+}
+
+function randMine(){
+  return Math.random()*15 < difficulty; //the lower the difficulty, the less mines
 }
 
 
